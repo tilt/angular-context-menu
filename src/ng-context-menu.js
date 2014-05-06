@@ -5,57 +5,100 @@
  */
 angular
   .module('ng-context-menu', [])
-  .directive('contextMenu', ['$window', '$parse', function($window, $parse) {
+
+  .service('ContextMenuService', [function() {
+    var target;
+
+    // shared context
+    var contextMenu = {
+      opened: false,
+      context: {},
+    };
+
+    return {
+      open: function() {
+        contextMenu.opened = true;
+
+        target.addClass('opened');
+      },
+      close: function() {
+        contextMenu.opened = false;
+        contextMenu.context = {};
+
+        target.removeClass('opened');
+      },
+      opened: function() {
+        return contextMenu.opened;
+      },
+      setContext: function(scope) {
+        contextMenu.context = scope;
+      },
+      getContextMenu: function() {
+        return contextMenu;
+      },
+
+      getTarget: function() {
+        return target;
+      },
+      setTarget: function(element) {
+        target = element;
+      }
+    };
+  }])
+
+  .directive('contextMenu', ['$window', '$parse', 'ContextMenuService', function($window, $parse, ContextMenuService) {
     return {
       restrict: 'A',
-      link: function($scope, element, attrs) {
-        var opened = false,
-          openTarget,
-          disabled = $scope.$eval(attrs.contextMenuDisabled),
+      link: function(scope, element, attrs) {
+        var openTarget,
+          disabled = scope.$eval(attrs.contextMenuDisabled),
           win = angular.element($window),
           menuElement = null,
           fn = $parse(attrs.contextMenu);
 
         function open(event, element) {
-          element.addClass('open');
           element.css('top', Math.max(event.pageY, 0) + 'px');
           element.css('left', Math.max(event.pageX, 0) + 'px');
-          opened = true;
+
+          ContextMenuService.open();
         }
 
         function close(element) {
-          opened = false;
-          element.removeClass('open');
+          ContextMenuService.close();
         }
 
         element.bind('contextmenu', function(event) {
           if (!disabled) {
             // Make sure the DOM is set before we try to find the menu
             if (menuElement === null) {
-              menuElement = angular.element(document.getElementById(attrs.target));
+              menuElement = attrs.target ? angular.element(document.getElementById(attrs.target)) : ContextMenuService.getTarget();
             }
+
+            ContextMenuService.setTarget(menuElement);
 
             openTarget = event.target;
             event.preventDefault();
             event.stopPropagation();
-            $scope.$apply(function() {
-              fn($scope, { $event: event });
+            scope.$apply(function() {
+              ContextMenuService.setContext(scope);
+
+              fn(scope, { $event: event });
               open(event, menuElement);
             });
           }
         });
 
         win.bind('keyup', function(event) {
-          if (!disabled && opened && event.keyCode === 27) {
-            $scope.$apply(function() {
+          if (!disabled && ContextMenuService.opened() && event.keyCode === 27) {
+            scope.$apply(function() {
               close(menuElement);
             });
           }
         });
 
         function handleWindowClickEvent(event) {
-          if (!disabled && opened && (event.button !== 2 || event.target !== openTarget)) {
-            $scope.$apply(function() {
+          if (!disabled && ContextMenuService.opened() && (event.button !== 2 || event.target !== openTarget)) {
+            scope.$apply(function() {
               close(menuElement);
             });
           }

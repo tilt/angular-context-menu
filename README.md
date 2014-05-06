@@ -26,6 +26,25 @@ var app = angular.module('menu-demo', ['ngRoute', 'ng-context-menu'])
 </div>
 ```
 
+You can access the scope of the clicked element by requiring the ContextMenuService, e.g.
+
+```javascript
+angular.module('myDirectives', ['ng-context-menu'])
+.directive('contextMenuContainer', ['ContextMenuService', function(ContextMenuService) {
+  return {
+    link: function(scope, element, attrs) {
+      ContextMenuService.setTarget(element);
+
+      scope.contextMenu = ContextMenuService.getContextMenu();
+
+      scope.$watch('contextMenu.opened', function(opened) {
+        scope.opened = opened;
+      });
+    }
+  };
+};
+```
+
 **Note:** Make sure your dropdown menu has ```css position: fixed```
 
 #### Disabling the contextmenu

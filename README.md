@@ -20,7 +20,7 @@ var app = angular.module('menu-demo', ['ngRoute', 'ng-context-menu'])
 #### Step 3: Add the context-menu directive to a DOM element
 
 ```html
-<div context-menu class="panel panel-default" data-target="myMenu"
+<div has-context-menu class="panel panel-default" data-target="myMenu"
      ng-class="{ 'highlight': highlight, 'expanded' : expanded }">
   ...
 </div>

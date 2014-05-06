@@ -47,7 +47,7 @@ angular
     };
   }])
 
-  .directive('contextMenu', ['$window', '$parse', 'ContextMenuService', function($window, $parse, ContextMenuService) {
+  .directive('hasContextMenu', ['$window', '$parse', 'ContextMenuService', function($window, $parse, ContextMenuService) {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {

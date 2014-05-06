@@ -15,7 +15,7 @@
   "license": "MIT",
   "homepage": "http://ianwalter.github.io/ng-context-menu/",
   "main": [
-    "dist/ng-context-menu.min.js",
+    "dist/ng-context-menu.js",
     "README.md"
   ],
   "ignore": [

@@ -2,6 +2,7 @@
  * ng-context-menu - v0.0.9 - An AngularJS directive to display a context menu when a right-click event is triggered
  *
  * @author Ian Kennington Walter (http://ianvonwalter.com)
+ * @collaborator Till Breuer (https://github.com/tilt)
  */
 angular
   .module('ng-context-menu', [])
@@ -54,7 +55,8 @@ angular
           disabled = scope.$eval(attrs.contextMenuDisabled),
           win = angular.element($window),
           menuElement = null,
-          fn = $parse(attrs.contextMenu);
+          fn = $parse(attrs.contextMenu),
+          processEvent = $parse(attrs.processEvent)(scope) || angular.noop;
 
         function open(event, element) {
           element.css('top', Math.max(event.pageY, 0) + 'px');
@@ -83,6 +85,7 @@ angular
               ContextMenuService.setContext(scope);
 
               fn(scope, { $event: event });
+              processEvent(event);
               open(event, menuElement);
             });
           }

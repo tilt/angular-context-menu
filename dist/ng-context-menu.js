@@ -56,6 +56,7 @@ angular
           win = angular.element($window),
           menuElement = null,
           fn = $parse(attrs.contextMenu),
+          triggerOnEvent = attrs.triggerOnEvent || 'contextmenu',
           processEvent = $parse(attrs.processEvent)(scope) || angular.noop;
 
         function open(event, element) {
@@ -69,7 +70,7 @@ angular
           ContextMenuService.close();
         }
 
-        element.bind('contextmenu', function(event) {
+        element.bind(triggerOnEvent, function(event) {
           if (!disabled) {
             // Make sure the DOM is set before we try to find the menu
             if (menuElement === null) {
@@ -110,7 +111,7 @@ angular
         // Firefox treats a right-click as a click and a contextmenu event while other browsers
         // just treat it as a contextmenu event
         win.bind('click', handleWindowClickEvent);
-        win.bind('contextmenu', handleWindowClickEvent);
+        win.bind(triggerOnEvent, handleWindowClickEvent);
       }
     };
   }]);

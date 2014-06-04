@@ -15,7 +15,7 @@ requirejs.config({
       'assets/lib/angular-route/angular-route.min'
     ],
     'ng-context-menu': [
-      'dist/ng-context-menu'
+      'dist/angular-context-menu'
     ]
   },
   shim: {
@@ -42,7 +42,7 @@ require(['angular', 'angular-route', 'ng-context-menu'], function(angular) {
 
       $scope.onRightClick = function(msg) {
         console.log(msg);
-      }
+      };
 
     }
   ]);

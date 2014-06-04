@@ -1,8 +1,8 @@
 {
-  "name": "ng-context-menu",
+  "name": "angular-context-menu",
   "version": "0.0.9",
   "description": "An AngularJS directive to display a context menu when a right-click event is triggered",
-  "main": "dist/ng-context-menu.min.js",
+  "main": "dist/angular-context-menu.min.js",
   "devDependencies": {
     "gulp": "~3.5.1",
     "gulp-concat": "~2.1.7",
@@ -14,12 +14,12 @@
     "test": "gulp test"
   },
   "keywords": [
-    "ng-context-menu",
+    "angular-context-menu",
     "context menu",
     "right click",
     "angularjs",
     "angular"
   ],
-  "author": "Ian Kennington Walter (http://ianvonwalter.com)",
+  "author": "Ian Kennington Walter (http://ianvonwalter.com), Briant Ford, Till Breuer (https://github.com/tilt)",
   "license": "MIT"
 }

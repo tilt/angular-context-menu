@@ -20,10 +20,29 @@ var app = angular.module('menu-demo', ['ngRoute', 'ng-context-menu'])
 #### Step 3: Add the context-menu directive to a DOM element
 
 ```html
-<div context-menu class="panel panel-default" data-target="myMenu"
+<div has-context-menu class="panel panel-default" data-target="myMenu"
      ng-class="{ 'highlight': highlight, 'expanded' : expanded }">
   ...
 </div>
+```
+
+You can access the scope of the clicked element by requiring the ContextMenuService, e.g.
+
+```javascript
+angular.module('myDirectives', ['ng-context-menu'])
+.directive('contextMenuContainer', ['ContextMenuService', function(ContextMenuService) {
+  return {
+    link: function(scope, element, attrs) {
+      ContextMenuService.setTarget(element);
+
+      scope.contextMenu = ContextMenuService.getContextMenu();
+
+      scope.$watch('contextMenu.opened', function(opened) {
+        scope.opened = opened;
+      });
+    }
+  };
+};
 ```
 
 **Note:** Make sure your dropdown menu has ```css position: fixed```

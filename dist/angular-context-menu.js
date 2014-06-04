@@ -1,138 +1,187 @@
 /**
- * ng-context-menu - v0.0.9 - An AngularJS directive to display a context menu when a right-click event is triggered
+ * @license
+ * angular-context-menu - v0.0.10 - An AngularJS directive to display a context menu
+ * (c) 2014
+ * License: MIT
  *
- * @author Ian Kennington Walter (http://ianvonwalter.com)
- * @collaborator Till Breuer (https://github.com/tilt)
+ * @authors Brian Ford (http://briantford.com), Ian Kennington Walter (http://ianvonwalter.com), Till Breuer (https://github.com/tilt)
  */
-angular
-  .module('ng-context-menu', [])
 
-  .service('ContextMenuService', [function() {
-    var registeredMenuElements = {};
+angular.module('ng-context-menu', [])
 
-    // shared context
-    var contextMenu = {
-      opened: false,
-      targetMenu: null,
-      context: {},
-    };
+.factory('ngContextMenu', [
+  '$q',
+  '$http',
+  '$compile',
+  '$templateCache',
+  '$animate',
+  '$rootScope',
+  '$controller',
+  function($q, $http, $compile, $templateCache, $animate, $rootScope, $controller) {
 
-    return {
-      open: function(targetMenu) {
-        contextMenu.targetMenu = targetMenu;
-        contextMenu.opened = true;
-
-        registeredMenuElements[targetMenu].addClass('opened');
-      },
-      close: function(targetMenu) {
-        contextMenu.targetMenu = null;
-        contextMenu.opened = false;
-        contextMenu.context = {};
-
-        angular.forEach(registeredMenuElements, function(element) {
-          element.removeClass('opened');
-        });
-      },
-      opened: function() {
-        return contextMenu.opened;
-      },
-
-      registerMenuElement: function(target, menuElement) {
-        registeredMenuElements[target] = menuElement;
-      },
-      getMenuElement: function(target) {
-        return registeredMenuElements[target];
-      },
-
-      setContext: function(scope) {
-        contextMenu.context = scope;
-      },
-      getContextMenu: function() {
-        return contextMenu;
-      },
-
-      getCurrentTaget: function() {
-        return contextMenu.targetMenu;
+    return function contextMenuFactory(config) {
+      if (!(!config.template ^ !config.templateUrl)) {
+        throw new Error('Expected context menu to have exacly one of either `template` or `templateUrl`');
       }
+
+      var template      = config.template,
+          controller    = config.controller || angular.noop,
+          controllerAs  = config.controllerAs,
+          container     = angular.element(config.container || document.body),
+          element       = null,
+          loadTemplate,
+          scope;
+
+      if (config.template) {
+        var deferred = $q.defer();
+        deferred.resolve(config.template);
+        loadTemplate = deferred.promise;
+      } else {
+        loadTemplate = $http.get(config.templateUrl, {
+          cache: $templateCache
+        }).
+        then(function (response) {
+          return response.data;
+        });
+      }
+
+      function open (position, locals) {
+        if (scope && locals) {
+          setLocals(locals);
+        }
+
+        return loadTemplate.then(function (html) {
+          if (!element) {
+            attach(html, locals);
+          }
+
+          // set absolute position
+          element.css('top', Math.max(position.y, 0) + 'px');
+          element.css('left', Math.max(position.x, 0) + 'px');
+        });
+      }
+
+
+      function attach (html, locals) {
+        element = angular.element(html);
+        if (element.length === 0) {
+         throw new Error('The template contains no elements; you need to wrap text nodes');
+        }
+        $animate.enter(element, container);
+
+        // create a new scope and copy locals to it
+        scope = $rootScope.$new();
+        if (locals) {
+          setLocals(locals);
+        }
+
+        var ctrl = $controller(controller, { $scope: scope });
+        if (controllerAs) {
+         scope[controllerAs] = ctrl;
+        }
+        $compile(element)(scope);
+      }
+
+      function setLocals(locals) {
+        for (var prop in locals) {
+         scope[prop] = locals[prop];
+        }
+      }
+
+      function close () {
+        var deferred = $q.defer();
+        if (element) {
+          $animate.leave(element, function () {
+            scope.$destroy();
+            element = null;
+            deferred.resolve();
+          });
+        } else {
+          deferred.resolve();
+        }
+        return deferred.promise;
+      }
+
+      function active () {
+        return !!element;
+      }
+
+      return {
+        open: open,
+        close: close,
+        active: active,
+      };
+
     };
-  }])
+}])
 
-  .directive('hasContextMenu', ['$window', '$parse', 'ContextMenuService', function($window, $parse, ContextMenuService) {
-    return {
-      restrict: 'A',
-      link: function(scope, element, attrs) {
-        var openTarget,
-          disabled = scope.$eval(attrs.contextMenuDisabled),
-          win = angular.element($window),
-          menuElement,
-          fn = $parse(attrs.contextMenu),
-          target = attrs.target,
-          triggerOnEvent = attrs.triggerOnEvent || 'contextmenu',
-          processEvent = $parse(attrs.processEvent)(scope) || angular.noop;
+.directive('hasContextMenu', [
+  '$injector',
+  '$window',
+  '$parse',
+  function($injector, $window, $parse) {
+  return {
+    restrict: 'A',
+    link: function(scope, element, attrs) {
+      var openTarget,
+        contextMenu = $injector.get(attrs.target),
+        locals = {},
+        win = angular.element($window),
+        menuElement,
+        triggerOnEvent = attrs.triggerOnEvent || 'contextmenu';
 
-        /* target         is a mandatory attribute and used to bind a specific context
+      /* contextMenu      is a mandatory attribute and used to bind a specific context
                           menu to the trigger event
-           triggerOnEvent allows for binding the event for opening the menu to "click"
-           processEvent   allows for patching event information, e.g. the target
-                          position before opening the context menu */
+         triggerOnEvent   allows for binding the event for opening the menu to "click" */
 
-        function open(event) {
-          menuElement.css('top', Math.max(event.pageY, 0) + 'px');
-          menuElement.css('left', Math.max(event.pageX, 0) + 'px');
+      // prepare locals, these define properties to be passed on to the context menu scope
+      var localKeys = attrs.locals.split(',').map(function(local) {
+        return local.trim();
+      });
+      angular.forEach(localKeys, function(key) {
+        locals[key] = scope[key];
+      });
 
-          ContextMenuService.open(target);
-        }
 
-        function close() {
-          ContextMenuService.close(target);
-        }
-
-        element.bind(triggerOnEvent, function(event) {
-          if (!disabled) {
-            menuElement = ContextMenuService.getMenuElement(target);
-
-            /* Make sure the DOM is set before we try to find the menu - therefore if
-               the element hasn't been registered try to look it up by its element id */
-            if (!menuElement) {
-              menuElement = angular.element(document.getElementById(target));
-              ContextMenuService.registerMenuElement(target, menuElement);
-            }
-
-            openTarget = event.target;
-            event.preventDefault();
-            event.stopPropagation();
-
-            scope.$apply(function() {
-              // make the scope of the clicked element available
-              ContextMenuService.setContext(scope);
-
-              fn(scope, { $event: event });
-              processEvent(event);
-              open(event);
-            });
-          }
-        });
-
-        win.bind('keyup', function(event) {
-          if (!disabled && ContextMenuService.opened() && event.keyCode === 27) {
-            scope.$apply(function() {
-              close();
-            });
-          }
-        });
-
-        function handleWindowClickEvent(event) {
-          if (!disabled && ContextMenuService.opened() && (event.button !== 2 || event.target !== openTarget)) {
-            scope.$apply(function() {
-              close();
-            });
-          }
-        }
-
-        // Firefox treats a right-click as a click and a contextmenu event while other browsers
-        // just treat it as a contextmenu event
-        win.bind('click', handleWindowClickEvent);
-        win.bind(triggerOnEvent, handleWindowClickEvent);
+      function open(event) {
+        contextMenu.open({x: event.pageX, y: event.pageY}, locals);
       }
-    };
-  }]);
+
+      function close() {
+        contextMenu.close();
+      }
+
+      element.bind(triggerOnEvent, function(event) {
+        openTarget = event.target;
+        event.preventDefault();
+        event.stopPropagation();
+
+        scope.$apply(function() {
+          open(event);
+        });
+      });
+
+      win.bind('keyup', function(event) {
+        if (contextMenu.active() && event.keyCode === 27) {
+          scope.$apply(function() {
+            close();
+          });
+        }
+      });
+
+      function handleWindowClickEvent(event) {
+        if (contextMenu.active() && openTarget && event.button !== 2) {
+
+          scope.$apply(function() {
+            close();
+          });
+        }
+      }
+
+      // Firefox treats a right-click as a click and a contextmenu event while other browsers
+      // just treat it as a contextmenu event
+      win.bind('click', handleWindowClickEvent);
+      win.bind(triggerOnEvent, handleWindowClickEvent);
+    }
+  };
+}]);

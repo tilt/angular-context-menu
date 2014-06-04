@@ -21,9 +21,9 @@ gulp.task('lint', function () {
 
 gulp.task('js', function () {
   gulp.src('src/**/*.js')
-    .pipe(concat('ng-context-menu.js'))
+    .pipe(concat('angular-context-menu.js'))
     .pipe(gulp.dest('dist'))
     .pipe(uglify())
-    .pipe(rename('ng-context-menu.min.js'))
+    .pipe(rename('angular-context-menu.min.js'))
     .pipe(gulp.dest('dist'));
 });

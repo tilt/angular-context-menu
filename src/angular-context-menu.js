@@ -1,6 +1,6 @@
 /**
  * @license
- * angular-context-menu - v0.0.10 - An AngularJS directive to display a context menu
+ * angular-context-menu - v0.1.1 - An AngularJS directive to display a context menu
  * (c) 2014
  * License: MIT
  *
@@ -45,7 +45,7 @@ angular.module('ng-context-menu', [])
         });
       }
 
-      function open (position, locals) {
+      function open (locals, css) {
         if (scope && locals) {
           setLocals(locals);
         }
@@ -54,10 +54,11 @@ angular.module('ng-context-menu', [])
           if (!element) {
             attach(html, locals);
           }
+          if (css) {
+            element.css(css);
+          }
 
-          // set absolute position
-          element.css('top', Math.max(position.y, 0) + 'px');
-          element.css('left', Math.max(position.x, 0) + 'px');
+          return element;
         });
       }
 
@@ -82,7 +83,7 @@ angular.module('ng-context-menu', [])
         $compile(element)(scope);
       }
 
-      function setLocals(locals) {
+      function setLocals (locals) {
         for (var prop in locals) {
          scope[prop] = locals[prop];
         }
@@ -109,7 +110,7 @@ angular.module('ng-context-menu', [])
       return {
         open: open,
         close: close,
-        active: active,
+        active: active
       };
 
     };
@@ -144,11 +145,19 @@ angular.module('ng-context-menu', [])
 
 
       function open(event) {
-        contextMenu.open({x: event.pageX, y: event.pageY}, locals);
+        // set absolute position
+        contextMenu.open(locals, getCssPositionProperties(event));
       }
 
       function close() {
         contextMenu.close();
+      }
+
+      function getCssPositionProperties(event) {
+        return {
+          top: Math.max(event.pageY, 0) + 'px',
+          left: Math.max(event.pageX, 0) + 'px'
+        };
       }
 
       element.bind(triggerOnEvent, function(event) {

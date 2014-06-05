@@ -1,4 +1,4 @@
-# [ng-context-menu](http://ianwalter.github.io/ng-context-menu/)
+# [Angular-context-menu](https://github.com/tilt/angular-context-menu)
 *An AngularJS directive to set up and open a context menu when a right-click or click event is triggered*
 
 #### Step 1: Install angular-context-menu
@@ -57,9 +57,12 @@ You can explicitly set the ``container`` when setting up the context menu factor
 </div>
 ```
 
-You can list locals, which are properties from the scope of the element opening the menu, which are forwarded to the context menu scope.
+You can list locals, which are properties from the scope of the element opening the menu, which will be forwarded to the context menu scope.
 
 
 **Note:** Make sure your dropdown menu has ```css position: fixed```
 
 The context menu will get its coordinates by the position of the mouse when the context menu menu receives the (right-) click event.
+
+
+A demo will be linked in a while.

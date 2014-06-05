@@ -1,7 +1,7 @@
 {
   "name": "angular-context-menu",
-  "version": "0.0.9",
-  "description": "An AngularJS directive to display a context menu when a right-click event is triggered",
+  "version": "0.1.0",
+  "description": "An AngularJS directive to set up and open a context menu when a right-click or click event is triggered",
   "keywords": [
     "angular-context-menu",
     "context menu",
@@ -10,7 +10,9 @@
     "angular"
   ],
   "authors": [
-    "Ian Kennington Walter (http://ianvonwalter.com)"
+    "Ian Kennington Walter (http://ianvonwalter.com)",
+    "Briant Ford",
+    "Till Breuer (https://github.com/tilt)"
   ],
   "license": "MIT",
   "main": [

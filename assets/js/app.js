@@ -28,14 +28,15 @@ requirejs.config({
 require(['angular', 'angular-route', 'ng-context-menu'], function(angular) {
   "use strict";
 
-  var app = angular.module('menu-demo', ['ngRoute', 'ng-context-menu'])
-    .config(['$routeProvider', function($routeProvider) {
-      $routeProvider
-        .when('/', { controller: 'HomeController', templateUrl: 'assets/template/home.html', label: 'Home' })
-        .otherwise({ redirectTo: '/' });
-    }]);
+  angular.module('menu-demo', ['ngRoute', 'ng-context-menu'])
 
-  app.controller('HomeController', [
+  .config(['$routeProvider', function($routeProvider) {
+    $routeProvider
+      .when('/', { controller: 'HomeController', templateUrl: 'assets/template/home.html', label: 'Home' })
+      .otherwise({ redirectTo: '/' });
+  }])
+
+  .controller('HomeController', [
     '$scope',
     function($scope) {
       $scope.message  = 'Right click triggered';

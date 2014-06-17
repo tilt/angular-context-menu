@@ -1,6 +1,6 @@
 /**
  * @license
- * angular-context-menu - v0.1.1 - An AngularJS directive to display a context menu
+ * angular-context-menu - v0.1.2 - An AngularJS directive to display a context menu
  * (c) 2014
  * License: MIT
  *
@@ -27,8 +27,8 @@ angular.module('ng-context-menu', [])
       var template      = config.template,
           controller    = config.controller || angular.noop,
           controllerAs  = config.controllerAs,
-          container     = angular.element(config.container || document.body),
           element       = null,
+          container     = null,
           loadTemplate,
           scope;
 
@@ -64,6 +64,7 @@ angular.module('ng-context-menu', [])
 
 
       function attach (html, locals) {
+        container = angular.element(config.container || document.body);
         element = angular.element(html);
         if (element.length === 0) {
          throw new Error('The template contains no elements; you need to wrap text nodes');

@@ -1,0 +1,22 @@
+<div class="dropdown" id="myMenu">
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+    <li role="presentation">
+      <a class="pointer" role="menuitem" tabindex="-1" ng-click="highlight = true">Select</a>
+    </li>
+    <li role="presentation">
+      <a class="pointer" role="menuitem" tabindex="-1" ng-click="highlight = false">Deselect</a>
+    </li>
+    <li role="presentation">
+      <a class="pointer" role="menuitem" tabindex="-1" ng-click="expanded = true">Expand</a>
+    </li>
+    <li role="presentation">
+      <a class="pointer" role="menuitem" tabindex="-1" ng-click="expanded = false">Contract</a>
+    </li>
+
+    <li>
+      <a class="pointer" role="menuitem" tabindex="-1" ng-bind="menuData"/>
+    </li>
+
+    <li ng-if="menuData"></li>
+  </ul>
+</div>

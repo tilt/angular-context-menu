@@ -41,12 +41,26 @@ require(['angular', 'angular-route', 'ng-context-menu'], function(angular) {
     function($scope) {
       $scope.message  = 'Right click triggered';
 
+      $scope.contextData = ['one', 'two', 'three'];
+
       $scope.onRightClick = function(msg) {
         console.log(msg);
       };
 
     }
-  ]);
+  ])
+
+  .factory('MyMenu', ['ngContextMenu', function(ngContextMenu) {
+    return ngContextMenu({
+      controller: 'MyContextMenuController',
+      controllerAs: 'contextMenu',
+      templateUrl: '/template/my_menu.html'
+    });
+  }])
+  .controller('MyContextMenuController', ['$scope', function($scope) {
+    // $scope.menuData is injected as a local.
+    $scope.menuEntryText = 'Menu entry for ' + $scope.menuData;
+  }]);
 
   angular.bootstrap(document , ['menu-demo']);
 });

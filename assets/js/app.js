@@ -54,7 +54,7 @@ require(['angular', 'angular-route', 'ng-context-menu'], function(angular) {
     return ngContextMenu({
       controller: 'MyContextMenuController',
       controllerAs: 'contextMenu',
-      templateUrl: '/template/my_menu.html'
+      templateUrl: 'assets/template/my_menu.html'
     });
   }])
   .controller('MyContextMenuController', ['$scope', function($scope) {

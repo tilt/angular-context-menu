@@ -1,15 +1,15 @@
-# [ng-context-menu](http://ianwalter.github.io/ng-context-menu/)
-*An AngularJS directive to display a context menu when a right-click event is triggered*
+# [Angular-context-menu](https://github.com/tilt/angular-context-menu)
+*An AngularJS directive to set up and open a context menu when a right-click or click event is triggered*
 
-#### Step 1: Install ng-context-menu
+#### Step 1: Install angular-context-menu
 
 Install using Bower:
 
 ```
-bower install ng-context-menu --save
+bower install angular-context-menu --save
 ```
 
-Include ng-context-menu.min.js in your app.
+Include angular-context-menu.js or angular-context-menu.min.js in your app.
 
 #### Step 2: Load the ng-context-menu module
 
@@ -17,23 +17,48 @@ Include ng-context-menu.min.js in your app.
 var app = angular.module('menu-demo', ['ngRoute', 'ng-context-menu'])
 ```
 
-#### Step 3: Add the context-menu directive to a DOM element
+
+#### Step 3: Define the context-menu using the context menu factory to glue together a template and a controller
+
+```javascript
+angular.module('myApp')
+
+.factory('MyContextMenu', [
+  'ngContextMenu',
+  function(ngContextMenu) {
+
+  return ngContextMenu({
+    controller: 'MyContextMenuController',
+    controllerAs: 'contextMenu',
+    templateUrl: '/templates/my_context_menu.html'
+  });
+}])
+
+.controller('MyContextMenuController', [
+  '$scope',
+  function($scope) {
+
+  $scope.menuEntries = [];
+}]);
+
+```
+
+You can explicitly set the ``container`` when setting up the context menu factory.
+
+
+#### Step 4: Add a context-menu handler to a DOM element
 
 ```html
-<div context-menu class="panel panel-default" data-target="myMenu"
-     ng-class="{ 'highlight': highlight, 'expanded' : expanded }">
+<div has-context-menu
+     class="panel panel-default"
+     data-target="MyContextMenu"
+     locals="some, properties"
   ...
 </div>
 ```
 
-**Note:** Make sure your dropdown menu has ```css position: fixed```
+You can list locals, which are properties from the scope of the element opening the menu, which will be forwarded to the context menu scope.
 
-#### Disabling the contextmenu
+The context menu will get its coordinates by the position of the mouse when the context menu menu receives the (right-) click event.
 
-If you need to disable the contextmenu in certain circumstances, you can add an expression to the
- ```context-menu-disabled``` attribute. If the expression evaluates to true, the contextmenu will be
- disabled, for example, ```context-menu-disabled="1 === 1"```
-
-That's it, I hope you find this useful!
-
-«–– [Ian](http://ianvonwalter.com)
+A demo will be linked in a while.

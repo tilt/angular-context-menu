@@ -15,7 +15,7 @@ requirejs.config({
       'assets/lib/angular-route/angular-route.min'
     ],
     'ng-context-menu': [
-      'dist/ng-context-menu'
+      'dist/angular-context-menu'
     ]
   },
   shim: {
@@ -28,24 +28,39 @@ requirejs.config({
 require(['angular', 'angular-route', 'ng-context-menu'], function(angular) {
   "use strict";
 
-  var app = angular.module('menu-demo', ['ngRoute', 'ng-context-menu'])
-    .config(['$routeProvider', function($routeProvider) {
-      $routeProvider
-        .when('/', { controller: 'HomeController', templateUrl: 'assets/template/home.html', label: 'Home' })
-        .otherwise({ redirectTo: '/' });
-    }]);
+  angular.module('menu-demo', ['ngRoute', 'ng-context-menu'])
 
-  app.controller('HomeController', [
+  .config(['$routeProvider', function($routeProvider) {
+    $routeProvider
+      .when('/', { controller: 'HomeController', templateUrl: 'assets/template/home.html', label: 'Home' })
+      .otherwise({ redirectTo: '/' });
+  }])
+
+  .controller('HomeController', [
     '$scope',
     function($scope) {
       $scope.message  = 'Right click triggered';
 
+      $scope.contextData = ['one', 'two', 'three'];
+
       $scope.onRightClick = function(msg) {
         console.log(msg);
-      }
+      };
 
     }
-  ]);
+  ])
+
+  .factory('MyMenu', ['ngContextMenu', function(ngContextMenu) {
+    return ngContextMenu({
+      controller: 'MyContextMenuController',
+      controllerAs: 'contextMenu',
+      templateUrl: '/template/my_menu.html'
+    });
+  }])
+  .controller('MyContextMenuController', ['$scope', function($scope) {
+    // $scope.menuData is injected as a local.
+    $scope.menuEntryText = 'Menu entry for ' + $scope.menuData;
+  }]);
 
   angular.bootstrap(document , ['menu-demo']);
 });

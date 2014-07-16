@@ -59,10 +59,6 @@ You can explicitly set the ``container`` when setting up the context menu factor
 
 You can list locals, which are properties from the scope of the element opening the menu, which will be forwarded to the context menu scope.
 
-
-**Note:** Make sure your dropdown menu has ```css position: fixed```
-
 The context menu will get its coordinates by the position of the mouse when the context menu menu receives the (right-) click event.
-
 
 A demo will be linked in a while.

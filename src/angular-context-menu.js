@@ -163,7 +163,7 @@ angular.module('ng-context-menu', [])
         };
       }
 
-      element.bind(triggerOnEvent, function(event) {
+      function openContextMenu(event) {
         openTarget = event.target;
         event.preventDefault();
         event.stopPropagation();
@@ -171,6 +171,10 @@ angular.module('ng-context-menu', [])
         scope.$apply(function() {
           open(event);
         });
+      }
+
+      element.bind(triggerOnEvent, function(event) {
+        openContextMenu(event);
       });
 
       win.bind('keyup', function(event) {

@@ -157,10 +157,19 @@ angular.module('ng-context-menu', [])
       }
 
       function getCssPositionProperties(event) {
-        return {
-          top: Math.max(event.pageY, 0) + 'px',
-          left: Math.max(event.pageX, 0) + 'px'
-        };
+        var position = { };
+
+        if (event.pageX && event.pageY) {
+          position.top = Math.max(event.pageY, 0) + 'px';
+          position.left = Math.max(event.pageX, 0) + 'px';
+        } else {
+          var bounding = angular.element(openTarget)[0].getBoundingClientRect();
+
+          position.top = Math.max(bounding.bottom, 0) + 'px';
+          position.left = Math.max(bounding.left, 0) + 'px';
+        }
+
+        return position;
       }
 
       function openContextMenu(event) {
@@ -186,6 +195,13 @@ angular.module('ng-context-menu', [])
       win.bind('keyup', function(event) {
         if (contextMenu.active() && event.keyCode === 27) {
           closeContextMenu();
+        }
+
+        // Shift + C
+        if (event.keyCode === 67 && event.shiftKey) {
+          if (!contextMenu.active()) {
+            openContextMenu(event);
+          }
         }
       });
 

@@ -121,7 +121,8 @@ angular.module('ng-context-menu', [])
   '$injector',
   '$window',
   '$parse',
-  function($injector, $window, $parse) {
+  '$timeout',
+  function($injector, $window, $parse, $timeout) {
   return {
     restrict: 'A',
     link: function(scope, element, attrs) {
@@ -149,21 +150,40 @@ angular.module('ng-context-menu', [])
 
       function open(event) {
         // set absolute position
-        contextMenu.open(locals, getCssPositionProperties(event));
+        var contextMenuPromise = contextMenu.open(locals, getCssPositionProperties(event));
+
+        contextMenuPromise.then(function(element) {
+          angular.element(element).trap();
+        });
       }
 
       function close() {
         contextMenu.close();
+
+        if (openTarget) {
+          $timeout(function() {
+            openTarget.focus();
+          });
+        }
       }
 
       function getCssPositionProperties(event) {
-        return {
-          top: Math.max(event.pageY, 0) + 'px',
-          left: Math.max(event.pageX, 0) + 'px'
-        };
+        var position = { };
+
+        if (event.pageX && event.pageY) {
+          position.top = Math.max(event.pageY, 0) + 'px';
+          position.left = Math.max(event.pageX, 0) + 'px';
+        } else {
+          var bounding = angular.element(openTarget)[0].getBoundingClientRect();
+
+          position.top = Math.max(bounding.bottom, 0) + 'px';
+          position.left = Math.max(bounding.left, 0) + 'px';
+        }
+
+        return position;
       }
 
-      element.bind(triggerOnEvent, function(event) {
+      function openContextMenu(event) {
         openTarget = event.target;
         event.preventDefault();
         event.stopPropagation();
@@ -171,22 +191,34 @@ angular.module('ng-context-menu', [])
         scope.$apply(function() {
           open(event);
         });
+      }
+
+      function closeContextMenu() {
+        scope.$apply(function() {
+          close();
+        });
+      }
+
+      element.bind(triggerOnEvent, function(event) {
+        openContextMenu(event);
       });
 
       win.bind('keyup', function(event) {
         if (contextMenu.active() && event.keyCode === 27) {
-          scope.$apply(function() {
-            close();
-          });
+          closeContextMenu();
+        }
+
+        // Shift + C
+        if (event.keyCode === 67 && event.shiftKey) {
+          if (!contextMenu.active()) {
+            openContextMenu(event);
+          }
         }
       });
 
       function handleWindowClickEvent(event) {
         if (contextMenu.active() && openTarget && event.button !== 2) {
-
-          scope.$apply(function() {
-            close();
-          });
+          closeContextMenu();
         }
       }
 

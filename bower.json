@@ -12,7 +12,8 @@
   "authors": [
     "Ian Kennington Walter (http://ianvonwalter.com)",
     "Briant Ford",
-    "Till Breuer (https://github.com/tilt)"
+    "Till Breuer (https://github.com/tilt)",
+    "finnlabs GmbH (http://finn.de)"
   ],
   "license": "MIT",
   "main": [

@@ -5,11 +5,11 @@ var gulp = require('gulp'),
     rename = require('gulp-rename');
 
 gulp.task('default', function () {
-  gulp.run('lint', 'js');
+  gulp.start('lint', 'js');
 
   gulp.watch('src/**/*.js', function (event) {
     console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
-    gulp.run('lint', 'js');
+    gulp.start('lint', 'js');
   });
 });
 

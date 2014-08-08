@@ -149,7 +149,11 @@ angular.module('ng-context-menu', [])
 
       function open(event) {
         // set absolute position
-        contextMenu.open(locals, getCssPositionProperties(event));
+        var contextMenuPromise = contextMenu.open(locals, getCssPositionProperties(event));
+
+        contextMenuPromise.then(function(element) {
+          angular.element(element).trap();
+        });
       }
 
       function close() {

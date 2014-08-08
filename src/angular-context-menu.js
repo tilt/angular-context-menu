@@ -173,24 +173,25 @@ angular.module('ng-context-menu', [])
         });
       }
 
+      function closeContextMenu() {
+        scope.$apply(function() {
+          close();
+        });
+      }
+
       element.bind(triggerOnEvent, function(event) {
         openContextMenu(event);
       });
 
       win.bind('keyup', function(event) {
         if (contextMenu.active() && event.keyCode === 27) {
-          scope.$apply(function() {
-            close();
-          });
+          closeContextMenu();
         }
       });
 
       function handleWindowClickEvent(event) {
         if (contextMenu.active() && openTarget && event.button !== 2) {
-
-          scope.$apply(function() {
-            close();
-          });
+          closeContextMenu();
         }
       }
 

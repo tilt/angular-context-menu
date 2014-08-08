@@ -121,7 +121,8 @@ angular.module('ng-context-menu', [])
   '$injector',
   '$window',
   '$parse',
-  function($injector, $window, $parse) {
+  '$timeout',
+  function($injector, $window, $parse, $timeout) {
   return {
     restrict: 'A',
     link: function(scope, element, attrs) {
@@ -158,6 +159,12 @@ angular.module('ng-context-menu', [])
 
       function close() {
         contextMenu.close();
+
+        if (openTarget) {
+          $timeout(function() {
+            openTarget.focus();
+          });
+        }
       }
 
       function getCssPositionProperties(event) {

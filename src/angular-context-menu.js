@@ -57,11 +57,10 @@ angular.module('ng-context-menu', [])
           if (css) {
             element.css(css);
           }
-
+          adjustPosition(element);
           return element;
         });
       }
-
 
       function attach (html, locals) {
         container = angular.element(config.container || document.body);
@@ -104,6 +103,17 @@ angular.module('ng-context-menu', [])
         return deferred.promise;
       }
 
+      function adjustPosition(element) {
+        var windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
+        var windowWidth = 'innerWidth' in window ? window.innerWidth : document.documentElement.offsetWidth;
+        if (windowHeight < element[0].offsetTop + element[0].offsetHeight) {
+          element.css('top', element[0].offsetTop - element[0].offsetHeight + 'px');
+        }
+        if (windowWidth < element[0].offsetLeft + element[0].offsetWidth) {
+          element.css('left', element[0].offsetLeft - element[0].offsetWidth + 'px');
+        }
+      }
+
       function active () {
         return !!element;
       }
@@ -137,14 +147,12 @@ angular.module('ng-context-menu', [])
          triggerOnEvent   allows for binding the event for opening the menu to "click" */
 
       // prepare locals, these define properties to be passed on to the context menu scope
-      if (attrs.locals) {
-        var localKeys = attrs.locals.split(',').map(function(local) {
-          return local.trim();
-        });
-        angular.forEach(localKeys, function(key) {
-          locals[key] = scope[key];
-        });
-      }
+      var localKeys = attrs.locals.split(',').map(function(local) {
+        return local.trim();
+      });
+      angular.forEach(localKeys, function(key) {
+        locals[key] = scope[key];
+      });
 
 
       function open(event) {

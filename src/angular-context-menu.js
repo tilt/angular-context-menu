@@ -147,12 +147,14 @@ angular.module('ng-context-menu', [])
          triggerOnEvent   allows for binding the event for opening the menu to "click" */
 
       // prepare locals, these define properties to be passed on to the context menu scope
-      var localKeys = attrs.locals.split(',').map(function(local) {
-        return local.trim();
-      });
-      angular.forEach(localKeys, function(key) {
-        locals[key] = scope[key];
-      });
+      if (attrs.locals) {
+        var localKeys = attrs.locals.split(',').map(function(local) {
+          return local.trim();
+        });
+        angular.forEach(localKeys, function(key) {
+          locals[key] = scope[key];
+        });
+      }
 
 
       function open(event) {

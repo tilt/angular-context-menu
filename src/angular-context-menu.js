@@ -202,7 +202,7 @@ angular.module('ng-context-menu', [])
 
       // Firefox treats a right-click as a click and a contextmenu event while other browsers
       // just treat it as a contextmenu event
-      win.bind('click', handleWindowClickEvent);
+      win.bind('mousedown', handleWindowClickEvent);
       win.bind(triggerOnEvent, handleWindowClickEvent);
     }
   };

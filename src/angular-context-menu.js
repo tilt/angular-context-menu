@@ -1,10 +1,10 @@
 /**
  * @license
- * angular-context-menu - v0.1.3 - An AngularJS directive to display a context menu
+ * angular-context-menu - v0.1.4 - An AngularJS directive to display a context menu
  * (c) 2014
  * License: MIT
  *
- * @authors Brian Ford (http://briantford.com), Ian Kennington Walter (http://ianvonwalter.com), Till Breuer (https://github.com/tilt)
+ * @authors Brian Ford (http://briantford.com), Ian Kennington Walter (http://ianvonwalter.com), Till Breuer (https://github.com/tilt), Gelu Timoficiuc (https://github.com/tgelu)
  */
 
 angular.module('ng-context-menu', [])

@@ -1,10 +1,10 @@
 /**
  * @license
- * angular-context-menu - v0.1.3 - An AngularJS directive to display a context menu
+ * angular-context-menu - v0.1.4 - An AngularJS directive to display a context menu
  * (c) 2014
  * License: MIT
  *
- * @authors Brian Ford (http://briantford.com), Ian Kennington Walter (http://ianvonwalter.com), Till Breuer (https://github.com/tilt)
+ * @authors Brian Ford (http://briantford.com), Ian Kennington Walter (http://ianvonwalter.com), Till Breuer (https://github.com/tilt), Gelu Timoficiuc (https://github.com/tgelu)
  */
 
 angular.module('ng-context-menu', [])
@@ -148,10 +148,9 @@ angular.module('ng-context-menu', [])
 
       // prepare locals, these define properties to be passed on to the context menu scope
       if (attrs.locals) {
-        var localKeys = attrs.locals.split(',').map(function(local) {
-          return local.trim();
-        });
+        var localKeys = attrs.locals.split(',');
         angular.forEach(localKeys, function(key) {
+          key = key.trim();
           locals[key] = scope[key];
         });
       }
@@ -167,9 +166,16 @@ angular.module('ng-context-menu', [])
       }
 
       function getCssPositionProperties(event) {
+        if (event.pageX || event.pageY) {
+          clickX = event.pageX;
+          clickY = event.pageY;
+        } else {
+          clickX = event.clientX + document.documentElement.scrollLeft;
+          clickY = event.clientY + document.documentElement.scrollTop;
+        }
         return {
-          top: Math.max(event.pageY, 0) + 'px',
-          left: Math.max(event.pageX, 0) + 'px'
+          left: Math.max(clickX, 0) + 'px',
+          top: Math.max(clickY, 0) + 'px'
         };
       }
 
@@ -202,7 +208,7 @@ angular.module('ng-context-menu', [])
 
       // Firefox treats a right-click as a click and a contextmenu event while other browsers
       // just treat it as a contextmenu event
-      win.bind('mousedown', handleWindowClickEvent);
+      win.bind('click', handleWindowClickEvent);
       win.bind(triggerOnEvent, handleWindowClickEvent);
     }
   };

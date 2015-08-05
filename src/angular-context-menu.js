@@ -1,6 +1,6 @@
 /**
  * @license
- * angular-context-menu - v0.1.4 - An AngularJS directive to display a context menu
+ * angular-context-menu - v0.1.5 - An AngularJS directive to display a context menu
  * (c) 2014
  * License: MIT
  *

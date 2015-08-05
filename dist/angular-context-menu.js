@@ -129,16 +129,16 @@ angular.module('ng-context-menu', [])
 
 .directive('hasContextMenu', [
   '$injector',
-  '$window',
+  '$document',
   '$parse',
-  function($injector, $window, $parse) {
+  function($injector, $document, $parse) {
   return {
     restrict: 'A',
     link: function(scope, element, attrs) {
       var openTarget,
         contextMenu = $injector.get(attrs.target),
         locals = {},
-        win = angular.element($window),
+        doc = angular.element($document),
         menuElement,
         triggerOnEvent = attrs.triggerOnEvent || 'contextmenu';
 
@@ -189,7 +189,7 @@ angular.module('ng-context-menu', [])
         });
       });
 
-      win.bind('keyup', function(event) {
+      doc.bind('keyup', function(event) {
         if (contextMenu.active() && event.keyCode === 27) {
           scope.$apply(function() {
             close();
@@ -208,8 +208,8 @@ angular.module('ng-context-menu', [])
 
       // Firefox treats a right-click as a click and a contextmenu event while other browsers
       // just treat it as a contextmenu event
-      win.bind('click', handleWindowClickEvent);
-      win.bind(triggerOnEvent, handleWindowClickEvent);
+      doc.bind('click', handleWindowClickEvent);
+      doc.bind(triggerOnEvent, handleWindowClickEvent);
     }
   };
 }]);

@@ -1,6 +1,6 @@
 /**
  * @license
- * angular-context-menu - v0.1.5 - An AngularJS directive to display a context menu
+ * angular-context-menu - v0.1.6 - An AngularJS directive to display a context menu
  * (c) 2014
  * License: MIT
  *
@@ -12,12 +12,13 @@ angular.module('ng-context-menu', [])
 .factory('ngContextMenu', [
   '$q',
   '$http',
+  '$timeout',
   '$compile',
   '$templateCache',
   '$animate',
   '$rootScope',
   '$controller',
-  function($q, $http, $compile, $templateCache, $animate, $rootScope, $controller) {
+  function($q, $http, $timeout, $compile, $templateCache, $animate, $rootScope, $controller) {
 
     return function contextMenuFactory(config) {
       if (!(!config.template ^ !config.templateUrl)) {
@@ -106,12 +107,14 @@ angular.module('ng-context-menu', [])
       function adjustPosition(element) {
         var windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
         var windowWidth = 'innerWidth' in window ? window.innerWidth : document.documentElement.offsetWidth;
-        if (windowHeight < element[0].offsetTop + element[0].offsetHeight) {
-          element.css('top', element[0].offsetTop - element[0].offsetHeight + 'px');
-        }
-        if (windowWidth < element[0].offsetLeft + element[0].offsetWidth) {
-          element.css('left', element[0].offsetLeft - element[0].offsetWidth + 'px');
-        }
+        $timeout(function() {
+            if (windowHeight < element[0].offsetTop + element[0].offsetHeight) {
+              element.css('top', element[0].offsetTop - element[0].offsetHeight + 'px');
+            }
+            if (windowWidth < element[0].offsetLeft + element[0].offsetWidth) {
+              element.css('left', element[0].offsetLeft - element[0].offsetWidth + 'px');
+            }
+        }, 0);
       }
 
       function active () {

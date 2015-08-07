@@ -1,10 +1,10 @@
 /**
  * @license
- * angular-context-menu - v0.1.2 - An AngularJS directive to display a context menu
+ * angular-context-menu - v0.1.6 - An AngularJS directive to display a context menu
  * (c) 2014
  * License: MIT
  *
- * @authors Brian Ford (http://briantford.com), Ian Kennington Walter (http://ianvonwalter.com), Till Breuer (https://github.com/tilt)
+ * @authors Brian Ford (http://briantford.com), Ian Kennington Walter (http://ianvonwalter.com), Till Breuer (https://github.com/tilt), Gelu Timoficiuc (https://github.com/tgelu)
  */
 
 angular.module('ng-context-menu', [])
@@ -12,12 +12,13 @@ angular.module('ng-context-menu', [])
 .factory('ngContextMenu', [
   '$q',
   '$http',
+  '$timeout',
   '$compile',
   '$templateCache',
   '$animate',
   '$rootScope',
   '$controller',
-  function($q, $http, $compile, $templateCache, $animate, $rootScope, $controller) {
+  function($q, $http, $timeout, $compile, $templateCache, $animate, $rootScope, $controller) {
 
     return function contextMenuFactory(config) {
       if (!(!config.template ^ !config.templateUrl)) {
@@ -57,11 +58,10 @@ angular.module('ng-context-menu', [])
           if (css) {
             element.css(css);
           }
-
+          adjustPosition(element);
           return element;
         });
       }
-
 
       function attach (html, locals) {
         container = angular.element(config.container || document.body);
@@ -104,6 +104,19 @@ angular.module('ng-context-menu', [])
         return deferred.promise;
       }
 
+      function adjustPosition(element) {
+        var windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
+        var windowWidth = 'innerWidth' in window ? window.innerWidth : document.documentElement.offsetWidth;
+        $timeout(function() {
+            if (windowHeight < element[0].offsetTop + element[0].offsetHeight) {
+              element.css('top', element[0].offsetTop - element[0].offsetHeight + 'px');
+            }
+            if (windowWidth < element[0].offsetLeft + element[0].offsetWidth) {
+              element.css('left', element[0].offsetLeft - element[0].offsetWidth + 'px');
+            }
+        }, 0);
+      }
+
       function active () {
         return !!element;
       }
@@ -119,16 +132,16 @@ angular.module('ng-context-menu', [])
 
 .directive('hasContextMenu', [
   '$injector',
-  '$window',
+  '$document',
   '$parse',
-  function($injector, $window, $parse) {
+  function($injector, $document, $parse) {
   return {
     restrict: 'A',
     link: function(scope, element, attrs) {
       var openTarget,
         contextMenu = $injector.get(attrs.target),
         locals = {},
-        win = angular.element($window),
+        doc = angular.element($document),
         menuElement,
         triggerOnEvent = attrs.triggerOnEvent || 'contextmenu';
 
@@ -138,10 +151,9 @@ angular.module('ng-context-menu', [])
 
       // prepare locals, these define properties to be passed on to the context menu scope
       if (attrs.locals) {
-        var localKeys = attrs.locals.split(',').map(function(local) {
-          return local.trim();
-        });
+        var localKeys = attrs.locals.split(',');
         angular.forEach(localKeys, function(key) {
+          key = key.trim();
           locals[key] = scope[key];
         });
       }
@@ -157,9 +169,16 @@ angular.module('ng-context-menu', [])
       }
 
       function getCssPositionProperties(event) {
+        if (event.pageX || event.pageY) {
+          clickX = event.pageX;
+          clickY = event.pageY;
+        } else {
+          clickX = event.clientX + document.documentElement.scrollLeft;
+          clickY = event.clientY + document.documentElement.scrollTop;
+        }
         return {
-          top: Math.max(event.pageY, 0) + 'px',
-          left: Math.max(event.pageX, 0) + 'px'
+          left: Math.max(clickX, 0) + 'px',
+          top: Math.max(clickY, 0) + 'px'
         };
       }
 
@@ -173,7 +192,7 @@ angular.module('ng-context-menu', [])
         });
       });
 
-      win.bind('keyup', function(event) {
+      doc.bind('keyup', function(event) {
         if (contextMenu.active() && event.keyCode === 27) {
           scope.$apply(function() {
             close();
@@ -192,8 +211,8 @@ angular.module('ng-context-menu', [])
 
       // Firefox treats a right-click as a click and a contextmenu event while other browsers
       // just treat it as a contextmenu event
-      win.bind('click', handleWindowClickEvent);
-      win.bind(triggerOnEvent, handleWindowClickEvent);
+      doc.bind('click', handleWindowClickEvent);
+      doc.bind(triggerOnEvent, handleWindowClickEvent);
     }
   };
 }]);
